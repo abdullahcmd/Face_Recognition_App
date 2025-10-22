@@ -1,39 +1,57 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, Text, View, Animated } from "react-native";
 import FaceRecognitionScreen from "./src/screens/facialRecognitionScreen";
+
 export default function App() {
-  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    // Fade-in animation for the splash text
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 800,
+      useNativeDriver: true,
+    }).start();
+
+    // Splash screen timeout (2 seconds)
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [fadeAnim]);
+
+  if (loading) {
+    return (
+      <View style={styles.splashContainer}>
+        <Animated.Text style={[styles.splashTitle, { opacity: fadeAnim }]}>
+          Face Recognition App
+        </Animated.Text>
+        <Text style={styles.splashSubtitle}>Powered by AI</Text>
+      </View>
+    );
+  }
 
   return <FaceRecognitionScreen />;
 }
 
 const styles = StyleSheet.create({
-  container: {
+  splashContainer: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f9f9f9",
-    paddingHorizontal: 20,
+    alignItems: "center",
+    backgroundColor: "#007bff",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: 10,
-    color: "#333",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 18,
-    color: "#666",
-  },
-  count: {
+  splashTitle: {
     fontSize: 28,
-    marginVertical: 10,
-    fontWeight: "600",
-    color: "#007AFF",
+    fontWeight: "bold",
+    color: "#fff",
+    marginBottom: 8,
   },
-  buttonContainer: {
-    marginTop: 20,
-    width: "60%",
+  splashSubtitle: {
+    fontSize: 16,
+    color: "#e0e0e0",
+    fontStyle: "italic",
   },
 });
